@@ -13,25 +13,7 @@ def update_clarity_ID (project,rally_apikey, perform_update: bool):
     global logger
     # 
     the_initiatives = dict()
-    #
-    # if not(initiatives_file == False):
-        
-    #     #print("Reading input from file: " + initiatives_file)
-    #     logger.info(log_header + "Reading input from file: " + str(initiatives_file))
-    #     with open(initiatives_file, "r", newline='', encoding='utf-8-sig') as csvfile:
-    #         rows = csv.DictReader(csvfile, fieldnames=("Initiative","ClarityID"),delimiter=',')
-    #         #
-    #         for row in rows:
-    #            # print(row['Initiative'], row['ClarityID'])
-    #            my_Initiative = row['Initiative']
-    #            my_ClarityID = row['ClarityID']
-    #            the_initiatives.update({my_Initiative: my_ClarityID})
-            
-    #         csvfile.close()
-            
-    # else:
-    #     logger.info(log_header + "**No csv file. Initiative and ClarityID values will be read from Initiatives.**")
- 
+    
     # # Rally endpoints & query parameters
     rally_base_url = "https://rally1.rallydev.com/slm/webservice/v2.0/"
     rally_initiative = rally_base_url + "portfolioitem/initiative"
@@ -41,6 +23,7 @@ def update_clarity_ID (project,rally_apikey, perform_update: bool):
     rally_defect = rally_base_url + "defect"
     rally_project_base = "https://rally1.rallydev.com/slm/webservice/v2.0/project/"
     rally_project_query = '?query=(Name = "' + project + '")'
+    rally_defect_query = '&query=(State != Closed)'
     rally_project_fields = "&fetch=Name,ObjectID"
     rally_query_params = "&fetch=Name,FormattedID,ObjectID,c_Initiative,c_ClarityID&projectScopeDown=true&pagesize=2000"
 
@@ -183,7 +166,7 @@ def update_clarity_ID (project,rally_apikey, perform_update: bool):
     #
     # # Fetch the Rally Defects
     rally_defect_response = requests.request(
-        "GET", rally_defect + rally_query + rally_query_params, headers=headers, verify=verify_cert_path)
+        "GET", rally_defect + rally_query + rally_defect_query + rally_query_params, headers=headers, verify=verify_cert_path)
     if rally_defect_response:
         logger.info(log_header + 'Success: ' + str(rally_defect_response.status_code) + ' Rally defects returned successfully.')
     else:
